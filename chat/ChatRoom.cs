@@ -10,17 +10,27 @@ namespace chat
 {
     public class ChatRoom
     {
-        private readonly ConcurrentDictionary<string, IServerStreamWriter<Message>> users = new ConcurrentDictionary<string, IServerStreamWriter<Message>>();
+        //private readonly ConcurrentDictionary<string, IServerStreamWriter<Message>> users = new ConcurrentDictionary<string, IServerStreamWriter<Message>>();
+        private readonly ConcurrentDictionary<string, KeyValuePair<int, IServerStreamWriter<Message>>> users =
+            new ConcurrentDictionary<string, KeyValuePair<int, IServerStreamWriter<Message>>>();
 
-        public void Join(string name, IServerStreamWriter<Message> response) => users.TryAdd(name, response);
-        public void Remove(string name) => users.TryRemove(name, out _);
+        public void Join(Message message, IServerStreamWriter<Message> response)
+        {
+            KeyValuePair<int, IServerStreamWriter<Message>> temp = new KeyValuePair<int, IServerStreamWriter<Message>>(message.Room, response);
+            users.TryAdd(message.User, temp);
+        }
+
+        public void Remove(string name)
+        {
+            users.TryRemove(name, out _);
+        } 
 
         public async Task BroadcastMessageAsync(Message message) => await BroadcastMessage(message);
         private async Task BroadcastMessage(Message message)
         {
-            foreach (var user in users.Where(x => x.Key != message.User))
+            foreach (var user in users.Where(x => x.Key != message.User && x.Value.Key.Equals(message.Room)))
             {
-                var item = await SendMessageToSubscriber(user, message);
+                var item = await SendMessageToSubscriber(user, message);    
                 if (item != null)
                 {
                     Remove(item?.Key);
@@ -28,11 +38,11 @@ namespace chat
             }
         }
 
-        private async Task<KeyValuePair<string, IServerStreamWriter<Message>>?> SendMessageToSubscriber(KeyValuePair<string, IServerStreamWriter<Message>> user, Message message)
+        private async Task<KeyValuePair<string, KeyValuePair<int, IServerStreamWriter<Message>>>?> SendMessageToSubscriber(KeyValuePair<string, KeyValuePair<int,IServerStreamWriter<Message>>> user, Message message)
         {
             try
             {
-                await user.Value.WriteAsync(message);
+                await user.Value.Value.WriteAsync(message);
                 return null;
             }
             catch (Exception ex)

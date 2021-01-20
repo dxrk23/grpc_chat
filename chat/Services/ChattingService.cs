@@ -19,11 +19,12 @@ namespace chat.Services
 
             do
             {
-                _chatRoomService.Join(requestStream.Current.User, responseStream);
+                _chatRoomService.Join(requestStream.Current , responseStream);
                 await _chatRoomService.BroadcastMessageAsync(requestStream.Current);
             } while (await requestStream.MoveNext());
 
             _chatRoomService.Remove(context.Peer);
         }
+
     }
 }

@@ -15,6 +15,8 @@ namespace chat.Client
 
             Console.Write("Please enter your name: ");
             var username = Console.ReadLine();
+            Console.Write("Please enter number of the room: ");
+            int room = Convert.ToInt32(Console.ReadLine());
 
             var channel = GrpcChannel.ForAddress("https://localhost:5001");
             var client = new ChatService.ChatServiceClient(channel);
@@ -25,11 +27,11 @@ namespace chat.Client
                     while (await chat.ResponseStream.MoveNext(CancellationToken))
                     {
                         var response = chat.ResponseStream.Current;
-                        Console.WriteLine($"{response.User} : {response.Text}");
+                        Console.WriteLine($"{response.Room} : {response.User} : {response.Text}");
                     }
                 });
 
-                await chat.RequestStream.WriteAsync(new Message { User = username, Text = $"{username} has joined the chat!" });
+                await chat.RequestStream.WriteAsync(new Message {Room = room, User = username, Text = $"{username} has joined the chat!" });
 
                 string line;
 
@@ -39,7 +41,7 @@ namespace chat.Client
                     {
                         break;
                     }
-                    await chat.RequestStream.WriteAsync(new Message { User = username, Text = line });
+                    await chat.RequestStream.WriteAsync(new Message { Room = room, User = username, Text = line });
                 }
 
                 await chat.RequestStream.CompleteAsync();
