@@ -4,7 +4,8 @@ option csharp_namespace = "ChatProject";
 
 service ChatService {
 	rpc Join(stream Message) returns (stream Message);
-	//rpc ToDB(Message) returns (Message);
+	rpc ToDB(Message) returns (Message);
+	rpc FromDB(Message) returns (Message);
 }
 
 message Message {

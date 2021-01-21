@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using ChatProject;
 using Grpc.Core;
 
@@ -24,6 +25,12 @@ namespace chat.Services
             } while (await requestStream.MoveNext());
 
             _chatRoomService.Remove(context.Peer);
+        }
+
+        public override async Task<Message> ToDB(Message request, ServerCallContext context)
+        {
+            await _chatRoomService.ToDatabase(request);
+            return request;
         }
 
     }

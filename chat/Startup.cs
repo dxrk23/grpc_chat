@@ -21,7 +21,7 @@ namespace chat
                 options.UseNpgsql(("Server=localhost;Port=5432;Database=grpcchat;User Id=postgres;Password=1234")));
             services.AddSingleton<ChatRoom>();
             services.AddCors();
-            services.AddGrpc();
+            services.AddGrpc(); 
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

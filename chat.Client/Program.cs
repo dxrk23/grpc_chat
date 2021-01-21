@@ -10,9 +10,10 @@ namespace chat.Client
     class Program
     {
         public static CancellationToken CancellationToken { get; }
+        
         static async Task Main(string[] args)
         {
-
+            var loaded = false;
             Console.Write("Please enter your name: ");
             var username = Console.ReadLine();
             Console.Write("Please enter number of the room: ");
@@ -20,6 +21,7 @@ namespace chat.Client
 
             var channel = GrpcChannel.ForAddress("https://localhost:5001");
             var client = new ChatService.ChatServiceClient(channel);
+
             using (var chat = client.Join())
             {
                 _ = Task.Run(async () =>
@@ -27,13 +29,15 @@ namespace chat.Client
                     while (await chat.ResponseStream.MoveNext(CancellationToken))
                     {
                         var response = chat.ResponseStream.Current;
-                        Console.WriteLine($"{response.Room} : {response.User} : {response.Text}");
+                        Console.WriteLine($"Room {response.Room} : {response.User} : {response.Text}");
                     }
                 });
 
                 await chat.RequestStream.WriteAsync(new Message {Room = room, User = username, Text = $"{username} has joined the chat!" });
 
                 string line;
+                
+
 
                 while ((line = Console.ReadLine()) != null)
                 {
@@ -41,6 +45,8 @@ namespace chat.Client
                     {
                         break;
                     }
+                    Console.Clear();
+                    client.ToDB(new Message {Room = room, User = username, Text = line});
                     await chat.RequestStream.WriteAsync(new Message { Room = room, User = username, Text = line });
                 }
 
