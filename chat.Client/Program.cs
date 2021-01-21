@@ -1,23 +1,22 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using chat.Services;
 using ChatProject;
 using Grpc.Net.Client;
 
 namespace chat.Client
 {
-    class Program
+    internal class Program
     {
         public static CancellationToken CancellationToken { get; }
-        
-        static async Task Main(string[] args)
+
+        private static async Task Main(string[] args)
         {
             var loaded = false;
             Console.Write("Please enter your name: ");
             var username = Console.ReadLine();
             Console.Write("Please enter number of the room: ");
-            int room = Convert.ToInt32(Console.ReadLine());
+            var room = Convert.ToInt32(Console.ReadLine());
 
             var channel = GrpcChannel.ForAddress("https://localhost:5001");
             var client = new ChatService.ChatServiceClient(channel);
@@ -33,21 +32,18 @@ namespace chat.Client
                     }
                 });
 
-                await chat.RequestStream.WriteAsync(new Message {Room = room, User = username, Text = $"{username} has joined the chat!" });
+                await chat.RequestStream.WriteAsync(new Message
+                    {Room = room, User = username, Text = $"{username} has joined the chat!"});
 
                 string line;
-                
 
 
                 while ((line = Console.ReadLine()) != null)
                 {
-                    if (line.ToUpper() == "EXIT")
-                    {
-                        break;
-                    }
+                    if (line.ToUpper() == "EXIT") break;
                     Console.Clear();
                     client.ToDB(new Message {Room = room, User = username, Text = line});
-                    await chat.RequestStream.WriteAsync(new Message { Room = room, User = username, Text = line });
+                    await chat.RequestStream.WriteAsync(new Message {Room = room, User = username, Text = line});
                 }
 
                 await chat.RequestStream.CompleteAsync();

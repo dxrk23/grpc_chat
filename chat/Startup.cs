@@ -4,10 +4,8 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-
 
 namespace chat
 {
@@ -18,10 +16,10 @@ namespace chat
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<DatabaseContext>(options =>
-                options.UseNpgsql(("Server=localhost;Port=5432;Database=grpcchat;User Id=postgres;Password=1234")));
+                options.UseNpgsql("Server=localhost;Port=5432;Database=grpcchat;User Id=postgres;Password=1234"));
             services.AddSingleton<ChatRoom>();
             services.AddCors();
-            services.AddGrpc(); 
+            services.AddGrpc();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

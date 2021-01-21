@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using ChatProject;
 using Grpc.Core;
 
@@ -14,13 +13,14 @@ namespace chat.Services
             _chatRoomService = chatRoomService;
         }
 
-        public override async Task Join(IAsyncStreamReader<Message> requestStream, IServerStreamWriter<Message> responseStream, ServerCallContext context)
+        public override async Task Join(IAsyncStreamReader<Message> requestStream,
+            IServerStreamWriter<Message> responseStream, ServerCallContext context)
         {
             if (!await requestStream.MoveNext()) return;
 
             do
             {
-                _chatRoomService.Join(requestStream.Current , responseStream);
+                _chatRoomService.Join(requestStream.Current, responseStream);
                 await _chatRoomService.BroadcastMessageAsync(requestStream.Current);
             } while (await requestStream.MoveNext());
 
@@ -32,6 +32,5 @@ namespace chat.Services
             await _chatRoomService.ToDatabase(request);
             return request;
         }
-
     }
 }

@@ -17,8 +17,6 @@ namespace chat
         private readonly ConcurrentDictionary<string, KeyValuePair<int, IServerStreamWriter<Message>>> users =
             new ConcurrentDictionary<string, KeyValuePair<int, IServerStreamWriter<Message>>>();
 
-        private readonly bool LoadedFromDatabase = false;
-
         public ChatRoom(IServiceScopeFactory scopeFactory)
         {
             _scopeFactory = scopeFactory;
@@ -101,12 +99,8 @@ namespace chat
                 var temptemp =
                     new KeyValuePair<string, KeyValuePair<int, IServerStreamWriter<Message>>>(temp.User, temppair);
                 foreach (var user in users)
-                {
-                    if (user.Value.Key == temp.Room &&  user.Key != temp.User)
-                    {
+                    if (user.Value.Key == temp.Room && user.Key != temp.User)
                         SendMessageToSubscriber(temptemp, temp);
-                    }
-                }
             }
         }
     }

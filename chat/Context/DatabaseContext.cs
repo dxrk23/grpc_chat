@@ -1,17 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using chat.Models;
+﻿using chat.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace chat.Context
 {
-    public class DatabaseContext : DbContext {
+    public class DatabaseContext : DbContext
+    {
         public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options)
         {
-
         }
+
+        public DbSet<Message> Messages { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -19,7 +17,5 @@ namespace chat.Context
                 .Property(p => p.Id)
                 .ValueGeneratedOnAdd();
         }
-
-        public DbSet<Message> Messages { get; set; }
     }
 }
