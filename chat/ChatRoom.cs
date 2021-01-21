@@ -43,10 +43,19 @@ namespace chat
         {
             foreach (var user in users.Where(x => x.Key != message.User && x.Value.Key.Equals(message.Room)))
             {
+                var msg = new Models.Message();
+
+                msg.MessageReceived += (sender, args) =>
+                {
+                    Console.WriteLine($"{args.SenderName} have sent message at {args.ReceivedDate}");
+                };
+
+                msg.OnMessageReceived(message);
                 var item = await SendMessageToSubscriber(user, message);
                 if (item != null) Remove(item?.Key);
             }
         }
+
 
         private async Task<KeyValuePair<string, KeyValuePair<int, IServerStreamWriter<Message>>>?>
             SendMessageToSubscriber(KeyValuePair<string, KeyValuePair<int, IServerStreamWriter<Message>>> user,

@@ -6,13 +6,12 @@ using Grpc.Net.Client;
 
 namespace chat.Client
 {
-    internal class Program
+    public class Program
     {
         public static CancellationToken CancellationToken { get; }
 
         private static async Task Main(string[] args)
         {
-            var loaded = false;
             Console.Write("Please enter your name: ");
             var username = Console.ReadLine();
             Console.Write("Please enter number of the room: ");
